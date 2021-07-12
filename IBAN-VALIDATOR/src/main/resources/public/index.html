@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>IBAN</title>
+  <meta charset="utf-8">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<br>
+<div  class="container">
+	<ul class="nav nav-tabs">
+	    <li class="active"><a data-toggle="tab" href="#home">Simple</a></li>
+	    <li><a data-toggle="tab" href="#menu1">IBAN File</a></li>
+	 </ul>
+	<div class="tab-content"> 
+		<div id="home" class="tab-pane fade in active">
+			<div class="container jumbotron text-center">
+			  <h2>IBAN VALIDATOR</h2>
+			  <form class="form-horizontal" action="#">
+			    <div class="form-group">
+			      <label class="control-label col-sm-2">Iban:</label>
+			      <div class="col-sm-10">
+			        <textarea class="form-control" id="ibanCode" placeholder="Enter Your IBAN" name="ibanCode"></textarea>
+			      </div>
+			    </div>
+
+			    <div class="form-group">        
+			      <div class="col-md-12">
+			        <button type="button" id="checkIban" class="btn btn-default btn-primary">check</button>
+			      </div>
+			    </div>
+			  </form>
+			</div>
+		</div>
+		<div id="menu1" class="tab-pane fade">
+			<div class="container jumbotron text-center">
+			  <h2>IBAN VALIDATOR File</h2>
+			  <form class="form-horizontal" action="#" enctype="multipart/form-data">
+			    <div class="form-group">
+			      <label class="control-label col-sm-2">Iban:</label>
+			      <div class="col-sm-10">
+			        <input type="file"  accept=".csv,text/plain" class="form-control" id="ibanFile" placeholder="Enter Your IBAN" name="ibanFile">
+			      </div>
+			    </div>
+
+			    <div class="form-group">        
+			      <div class="col-md-12">
+			        <button type="button" id="checkIbanFile" class="btn btn-default btn-primary">check</button>
+			      </div>
+			    </div>
+			  </form>
+			</div>
+		</div>
+	</div>
+</div>
+<table class="table table-sm" id="table" style="display: none;">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">IBAN</th>
+      <th scope="col">Is Valid</th>
+
+    </tr>
+  </thead>
+  <tbody>
+
+  </tbody>
+</table>
+
+</body>
+
+<script type="text/javascript">
+
+
+	$(document).on("click","#checkIban",function(){
+		$('#table').hide();
+		var ibanCode=$('#ibanCode').val();
+		validateIban(ibanCode,function(data){createTable(data);})
+	}).on("click","#checkIbanFile",function(){
+		$('#table').hide();
+		var ibanFile=$('#ibanFile')[0].files[0];
+		validateIbanFile(ibanFile,function(data){createTable(data);})
+	});		
+
+	function validateIban(ibanCode,callback){
+
+		if(ibanCode!=null && ibanCode!=""){
+			$.ajax({
+		        url:   getContextPath()+"/validate",
+		        type: "post",
+		        dataType: "json",
+		        data: {codes : ibanCode},
+		        success: function (result) {
+					callback(result);
+				},
+		        error:function(error){
+		        	callback(error);
+		        }
+
+			});
+		}
+	}
+
+	function getContextPath() {
+	    return window.location.pathname.substring(0, window.location.pathname.indexOf("/",2));
+	}
+
+
+	function validateIbanFile(ibanFile,callback){
+
+
+	    var data = new FormData();
+	    console.log(ibanFile);
+	    data.append("file",ibanFile);
+	    console.log(data);
+		// Ajax call for file uploaling
+		var ajaxReq = $.ajax({
+			url : getContextPath()+'/file/validate',
+			type : 'POST',
+			data : data,
+			cache : false,
+			contentType : false,
+			processData : false,
+			dataType: "json",
+			success: function (result) {
+				callback(result);
+			},
+	        error:function(error){
+	        	callback(error);
+	        }
+
+		});
+
+	}
+
+	function createTable(result){
+		if(result!=null){
+			$("#table tbody").empty();
+
+			$.each(result,function(index,value){
+				console.log(index,value);
+				console.log(index,Object.keys(value)[0]);
+
+				var key=Object.keys(value)[0];
+				var validFlag=value[key];
+
+				var $tr=$("<tr>").append(
+							$("<td>").append((index+1)),
+							$("<td>").append(key),
+							$("<td>").append(isValidText(validFlag))
+						).addClass(isValidClass(validFlag))
+				$("#table tbody").append($tr);		
+
+				});
+
+			$('#table').show();
+
+		}
+
+	}
+
+	function isValidText(flag){
+		return flag?"Valid":"Invalid";
+	}
+
+	function isValidClass(flag){
+		return flag?"success":"danger";
+	}
+
+</script>
+
+</html>
