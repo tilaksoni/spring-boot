@@ -15,13 +15,7 @@ public class MainServiceImpl implements MainService {
 	@Override
 	public JSONArray validateIBANList(String codes) {
 		//String[] codesArray=codes.split("[\\n,@&.?$+-]+"); //UNCOMMENT TO ADD MORE SPECIAL CHARACTER
-		String[] codesArray=codes.split("[\\n,]+");
-		JSONArray resultArray=new JSONArray();
-		for(String code:codesArray) {
-			LOGGER.info("code: {}",code);
-			resultArray.put(new JSONObject().put(code, IBANValidateUtil.isValid(code)));
-		}
-		return resultArray;
+		return validateStringData(codes);
 	}
 	
 	@Override
@@ -31,20 +25,36 @@ public class MainServiceImpl implements MainService {
 	        try {
 	            byte[] bytes = file.getBytes();
 	            String completeData = new String(bytes);
-	            System.out.println(completeData);
-	            String[] codesArray=completeData.split("[\\n]+");
-	    		for(String code:codesArray) {
-	    			System.out.println(code);
-	    			resultArray.put(new JSONObject().put(code, IBANValidateUtil.isValid(code)));
-	    		}
+	            resultArray=validateStringData(completeData);
 	    		}catch (Exception e) {
-	    			LOGGER.error("Exception: {}"+e.getMessage());
+	    			LOGGER.error("Exception: {}",e.getMessage());
 	    			return resultArray;
 
 	    		}
 		}
 		return resultArray;
 	}
+	
+	
+	public JSONArray validateStringData(String data) {
+		JSONArray resultArray=new JSONArray();
+		if(data!=null && !data.equals("")) {
+			String[] codesArray=data.split("[\\n,]+");
+			for(String code:codesArray) {
+				int validCode=IBANValidateUtil.isValid(code);
+				resultArray.put(new JSONObject()
+						.put("iban",code )
+						.put("message", IBANValidateUtil.isValidCodeMessageDesc(validCode))
+						.put("validFlag", validCode==1)
+						.put("code", validCode)
+						
+						);
+			}
+		}
+		return resultArray;
+	}
+	
+	
 
 
 

@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -20,8 +21,14 @@ public class MainRestController {
 	private MainService mainService;
 
 
+	@GetMapping(value="/validate")
+    public @ResponseBody ResponseEntity<String> validateIBANsGet(@RequestParam String codes) {
+		LOGGER.info("validate called");
+		return new ResponseEntity<String>(mainService.validateIBANList(codes).toString(), HttpStatus.OK);
+    }
+	
 	@PostMapping(value="/validate")
-    public @ResponseBody ResponseEntity<String> validateIBANs(@RequestParam String codes) {
+    public @ResponseBody ResponseEntity<String> validateIBANsPost(@RequestParam String codes) {
 		LOGGER.info("validate called");
 		return new ResponseEntity<String>(mainService.validateIBANList(codes).toString(), HttpStatus.OK);
     }

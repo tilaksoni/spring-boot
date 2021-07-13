@@ -143,15 +143,13 @@
 
 			$.each(result,function(index,value){
 				console.log(index,value);
-				console.log(index,Object.keys(value)[0]);
-
-				var key=Object.keys(value)[0];
-				var validFlag=value[key];
-
+				var iban=value.iban;
+				var validFlag=value.validFlag;
+				
 				var $tr=$("<tr>").append(
 							$("<td>").append((index+1)),
-							$("<td>").append(key),
-							$("<td>").append(isValidText(validFlag))
+							$("<td>").append(iban),
+							$("<td>").append(value.message)
 						).addClass(isValidClass(validFlag))
 				$("#table tbody").append($tr);		
 
@@ -163,9 +161,7 @@
 
 	}
 
-	function isValidText(flag){
-		return flag?"Valid":"Invalid";
-	}
+	
 
 	function isValidClass(flag){
 		return flag?"success":"danger";
