@@ -21,6 +21,7 @@ public class MainServiceImpl implements MainService {
 	@Override
 	public JSONArray validateIBANFile(MultipartFile file) {
 		JSONArray resultArray=new JSONArray();
+		
 		if (!file.isEmpty()) {
 	        try {
 	            byte[] bytes = file.getBytes();
