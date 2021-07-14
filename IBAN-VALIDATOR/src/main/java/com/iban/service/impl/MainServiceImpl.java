@@ -45,6 +45,8 @@ public class MainServiceImpl implements MainService {
 			String[] codesArray=data.split("[\\n,]+");
 			for(String code:codesArray) {
 				int validCode=IBANValidateUtil.isValid(code);
+				//remove white space
+			    code=code.replaceAll("\\s+","");
 				resultArray.put(new JSONObject()
 						.put("iban",code)
 						.put("message", IBANValidateUtil.isValidCodeMessageDesc(validCode))

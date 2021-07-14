@@ -30,16 +30,15 @@ public  class  IBANValidateUtil {
      *  Author: Rinku Soni 5:37:28 pm  11-Jul-2021															       																
      ************************************************************************************************************************
      */
-   public static int isValid(String iban) {
+   public static int isValid(String code) {
     	//json not loaded
 	   if(codeLengthJson==null) return -10;
-	   //basic  length check
-	   String code=iban.trim();
+	 //remove white space
+       code=code.replaceAll("\\s+","");
 	   if (code.length() == 0 ) return 0;
        if( code.length() < MIN_LENGTH_CODE ) return -4;
        if( code.length() > MAX_LENGTH_CODE) return -5;
-    	//remove white space
-        code=code.replaceAll("\\s+","");
+    	
         
         //get first two country code
         String countryCode=code.substring(0,2).toUpperCase();
@@ -106,7 +105,7 @@ public  class  IBANValidateUtil {
 				break;
 			case -4:message="IBAN should be Minimum "+MIN_LENGTH_CODE+ " Character Long";
 			break;
-			case -5:message="IBAN should not be Bigger then "+MAX_LENGTH_CODE+ " Characters";
+			case -5:message="IBAN should not be Bigger than "+MAX_LENGTH_CODE+ " Characters";
 			break;
 			case -10 :message="JSON file which has country length Not found";
 			break;
