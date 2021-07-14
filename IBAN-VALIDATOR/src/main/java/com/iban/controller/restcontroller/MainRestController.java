@@ -23,13 +23,13 @@ public class MainRestController {
 
 	@GetMapping(value="/validate")
     public @ResponseBody ResponseEntity<String> validateIBANsGet(@RequestParam String codes) {
-		LOGGER.info("validate called");
+		LOGGER.info("Get validate called");
 		return new ResponseEntity<String>(mainService.validateIBANList(codes).toString(), HttpStatus.OK);
     }
 	
 	@PostMapping(value="/validate")
     public @ResponseBody ResponseEntity<String> validateIBANsPost(@RequestParam String codes) {
-		LOGGER.info("validate called");
+		LOGGER.info("Post validate called");
 		return new ResponseEntity<String>(mainService.validateIBANList(codes).toString(), HttpStatus.OK);
     }
 
@@ -39,5 +39,11 @@ public class MainRestController {
 		LOGGER.info("File Validate called");
 		return new ResponseEntity<String>(mainService.validateIBANFile(file).toString(), HttpStatus.OK);
 	}
+	
+	@GetMapping(value="/fetch-list-supported-countries")
+    public @ResponseBody ResponseEntity<String> getListOfSupportedCountries() {
+		LOGGER.info("getListOfSupportedCountries called");
+		return new ResponseEntity<String>(mainService.getListOfSupportedCountries().toString(), HttpStatus.OK);
+    }
 
 }

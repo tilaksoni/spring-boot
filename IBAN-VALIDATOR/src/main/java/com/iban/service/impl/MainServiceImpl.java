@@ -6,6 +6,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.google.gson.Gson;
 import com.iban.service.MainService;
 import com.iban.util.IBANValidateUtil;
 
@@ -44,7 +46,7 @@ public class MainServiceImpl implements MainService {
 			for(String code:codesArray) {
 				int validCode=IBANValidateUtil.isValid(code);
 				resultArray.put(new JSONObject()
-						.put("iban",code )
+						.put("iban",code)
 						.put("message", IBANValidateUtil.isValidCodeMessageDesc(validCode))
 						.put("validFlag", validCode==1)
 						.put("code", validCode)
@@ -53,6 +55,12 @@ public class MainServiceImpl implements MainService {
 			}
 		}
 		return resultArray;
+	}
+
+	@Override
+	public JSONArray getListOfSupportedCountries() {
+		System.out.println(new Gson().toJson(IBANValidateUtil.supportedCountries));
+		return new JSONArray(IBANValidateUtil.supportedCountries);//just for fun
 	}
 	
 	

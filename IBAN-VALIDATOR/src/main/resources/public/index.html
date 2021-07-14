@@ -4,14 +4,22 @@
   <title>IBAN</title>
   <meta charset="utf-8">
 
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <style>
+	a {
+	
+	  padding-right: 5px;
+	  }
+</style>
 </head>
+
 <body>
 
 <br>
 <div  class="container">
+	<div id="alertDiv"></div>
 	<ul class="nav nav-tabs">
 	    <li class="active"><a data-toggle="tab" href="#home">Simple</a></li>
 	    <li><a data-toggle="tab" href="#menu1">IBAN File</a></li>
@@ -57,12 +65,20 @@
 		</div>
 	</div>
 </div>
+<div class="row" style="padding-right:25px">
+	<button type="button" class="btn btn-info" style="float: right;" data-toggle="collapse" data-target="#demo">Supported Countries</button>
+</div> 
+  <div id="demo" class="collapse">
+    <div id="supported-countries" style="padding-left:10px" ></div>
+  </div>
+
+  
 <table class="table table-sm" id="table" style="display: none;">
   <thead>
     <tr>
       <th scope="col">#</th>
       <th scope="col">IBAN</th>
-      <th scope="col">Is Valid</th>
+      <th scope="col">Message</th>
 
     </tr>
   </thead>
@@ -74,7 +90,11 @@
 </body>
 
 <script type="text/javascript">
-
+$(function(){
+	
+	supportedCountry();
+	
+})
 
 	$(document).on("click","#checkIban",function(){
 		$('#table').hide();
@@ -111,9 +131,7 @@
 
 
 	function validateIbanFile(ibanFile,callback){
-
-
-	    var data = new FormData();
+		var data = new FormData();
 	    console.log(ibanFile);
 	    data.append("file",ibanFile);
 	    console.log(data);
@@ -138,12 +156,12 @@
 	}
 
 	function createTable(result){
-		if(result!=null){
+		if(result!=null && Array.isArray(result) ){
 			$("#table tbody").empty();
 
 			$.each(result,function(index,value){
 				console.log(index,value);
-				var iban=value.iban;
+				var iban=(value.iban && value.iban.trim()!=""  )?value.iban:"-";
 				var validFlag=value.validFlag;
 				
 				var $tr=$("<tr>").append(
@@ -157,8 +175,13 @@
 
 			$('#table').show();
 
+		}else{
+			$('<div class="alert alert-danger show" role="alert">Some error Occured. Please try again</div>').insertBefore($('#alertDiv'));
+			
 		}
-
+		window.setTimeout(function() {
+		    $('.alert-success, .alert-danger').fadeOut('slow').alert('close');
+		}, 10000);//for 10 seconds
 	}
 
 	
@@ -166,6 +189,36 @@
 	function isValidClass(flag){
 		return flag?"success":"danger";
 	}
+	
+	function supportedCountry(){
+		var ajaxReq = $.ajax({
+			url : getContextPath()+'/fetch-list-supported-countries',
+			type : 'get',
+			dataType: "json",
+			success: function (result) {
+				$("#supported-countries").html("")
+				if(result!=null && Array.isArray(result) ){
+					$("#supported-countries").html("")
+					$.each(result,function(index,value){
+						
+						 var link = $("<a>");
+			             link.attr("href", "#");
+		                 link.attr("title", value.code);
+		                 link.text(value.country);
+		                 link.addClass("link");
+						$("#supported-countries").append(link);
+					});
+				}
+			},
+	        error:function(error){
+	        	console.log(error);
+	        	$("#supported-countries").html("NONE");
+	        }
+
+		});
+	}
+	
+	
 
 </script>
 

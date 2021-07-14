@@ -2,6 +2,10 @@ package com.iban.util;
 
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
@@ -12,8 +16,11 @@ public  class  IBANValidateUtil {
     private static final int MAX_ALPHANUMERIC_VALUE = 35; // Z last digit is 35
     private static final long MAX = 999999999; //max number for modulus 97
     private static final long MODULUS = 97;
+    private static final int MIN_LENGTH_CODE = 4;
+    private static final int MAX_LENGTH_CODE = 34;
     
     public static JSONObject codeLengthJson;
+    public static List<Map<String,String>> supportedCountries=new ArrayList<>();
     
     /**
      * **********************************************************************************************************************
@@ -23,17 +30,21 @@ public  class  IBANValidateUtil {
      *  Author: Rinku Soni 5:37:28 pm  11-Jul-2021															       																
      ************************************************************************************************************************
      */
-   public static int isValid(String code) {
-    	
-	   //basic null check
-    	if (code == null ) return 0;
-    	
+   public static int isValid(String iban) {
+    	//json not loaded
+	   if(codeLengthJson==null) return -10;
+	   //basic  length check
+	   String code=iban.trim();
+	   if (code.length() == 0 ) return 0;
+       if( code.length() < MIN_LENGTH_CODE ) return -4;
+       if( code.length() > MAX_LENGTH_CODE) return -5;
     	//remove white space
         code=code.replaceAll("\\s+","");
         
         //get first two country code
         String countryCode=code.substring(0,2).toUpperCase();
-
+       //if first two char is not A-Z
+        if(!countryCode.matches("^[A-Z]{2}")) { return -11;}//invalid
         /*check if the key is available or not 
         wiki :1 Check that the total IBAN length is correct as per the country. 
         If not, the IBAN is invalid*/
@@ -85,7 +96,7 @@ public  class  IBANValidateUtil {
     	switch (code) {
 			case 1: message="Valid";
 				break;
-			case 0:message="String is Empty";
+			case 0:message="String is EMPTY";
 				break;
 			case -1:message="We don't Support this country right now";
 				break;
@@ -93,7 +104,11 @@ public  class  IBANValidateUtil {
 				break;
 			case -3:message="Found weird character in Between";
 				break;
-			case -10 :message="JSON with country length Not found";
+			case -4:message="IBAN should be Minimum "+MIN_LENGTH_CODE+ " Character Long";
+			break;
+			case -5:message="IBAN should not be Bigger then "+MAX_LENGTH_CODE+ " Characters";
+			break;
+			case -10 :message="JSON file which has country length Not found";
 			break;
 			default:
 				message="Invalid";
